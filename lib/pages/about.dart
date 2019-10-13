@@ -1,7 +1,21 @@
+// Copyright 2019 KagurazakaHanabi<i@yaerin.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import 'dart:convert';
 
 import 'package:daily_pics/misc/bean.dart';
-import 'package:daily_pics/misc/utils.dart';
+import 'package:daily_pics/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'
     show CircleAvatar, Colors, Divider, ListTile, Scaffold, Theme, ThemeData;
@@ -46,9 +60,9 @@ class _AboutPageState extends State<AboutPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    double padding = Device.isIPad(context) && !Device.isPortrait(context)
-        ? (size.width - size.height) / 2
-        : 0;
+    double padding = SystemUtils.isIPad(context) && !SystemUtils.isPortrait(context)
+            ? (size.width - size.height) / 2
+            : 0;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: DefaultTextStyle(
@@ -222,7 +236,7 @@ class _AboutPageState extends State<AboutPage> {
                 _buildAction(
                   Ionicons.ios_star_half,
                   '评分',
-                  () => Utils.requestReview(false),
+                  () => SystemUtils.requestReview(false),
                 ),
               ],
             ),

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import 'package:daily_pics/misc/bean.dart';
-import 'package:daily_pics/misc/utils.dart';
+import 'package:daily_pics/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -43,13 +43,13 @@ class SliverImageCardList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool iPad = Device.isIPad(context, true);
-    bool portrait = Device.isPortrait(context);
-    int cnt = Device.isIPad(context)
+    bool iPad = SystemUtils.isIPad(context, true);
+    bool portrait = SystemUtils.isPortrait(context);
+    int cnt = SystemUtils.isIPad(context)
         ? iPad && !portrait && adaptiveTablet ? 6 : 2
         : 1;
     return SliverPadding(
-      padding: Device.isIPad(context, true)
+      padding: SystemUtils.isIPad(context, true)
           ? EdgeInsets.fromLTRB(12, 12, 12, 0)
           : EdgeInsets.only(left: 4, top: 15, right: 4),
       sliver: SliverStaggeredGrid.countBuilder(

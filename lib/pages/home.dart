@@ -13,15 +13,13 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:daily_pics/components/suggest.dart';
 import 'package:daily_pics/components/today.dart';
-import 'package:daily_pics/misc/constants.dart';
-import 'package:daily_pics/misc/utils.dart';
 import 'package:daily_pics/pages/about.dart';
 import 'package:daily_pics/pages/details.dart';
 import 'package:daily_pics/pages/recent.dart';
+import 'package:daily_pics/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ionicons/flutter_ionicons.dart';
@@ -30,6 +28,17 @@ import 'package:uni_links/uni_links.dart';
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
+
+  static void push(BuildContext context) {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(pageBuilder: (_, Animation<double> animation, __) {
+        return FadeTransition(
+          opacity: animation,
+          child: HomePage(),
+        );
+      }),
+    );
+  }
 }
 
 class _HomePageState extends State<HomePage> {
@@ -45,35 +54,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // 处理 App 内打开
-    getInitialUri().then(_handleUniLink);
     _subscription = getUriLinksStream().listen(_handleUniLink);
-
-    // 记录五天内启动次数，大于十次则允许展示 App 内评分
-    List<int> times = List.from(jsonDecode(Settings.launchTimes)).cast<int>();
-    DateTime lastLaunch;
-    if (Settings.lastLaunch == null) {
-      lastLaunch = DateTime.now();
-      Settings.lastLaunch = DateTime.now().toString();
-    } else {
-      lastLaunch = DateTime.parse(Settings.lastLaunch);
-    }
-    if (lastLaunch.day == DateTime.now().day) {
-      times[times.length - 1] += 1;
-    } else {
-      if (times.length == 5) times.removeAt(0);
-      times.add(1);
-      Settings.lastLaunch = DateTime.now().toString();
-    }
-    Settings.launchTimes = jsonEncode(times);
+    getInitialUri().then(_handleUniLink);
   }
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: Utils.isDarkColor(CupertinoTheme.of(context).barBackgroundColor)
-          ? OverlayStyles.light
-          : OverlayStyles.dark,
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
       child: CupertinoTabScaffold(
         resizeToAvoidBottomInset: false,
         tabBar: CupertinoTabBar(

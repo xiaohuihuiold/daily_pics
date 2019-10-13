@@ -16,16 +16,23 @@
 
 package com.yaerin.daily_pics;
 
-import android.os.Bundle;
+import java.io.IOException;
 
-import io.flutter.app.FlutterActivity;
-import io.flutter.plugins.GeneratedPluginRegistrant;
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel.Result;
 
-public class MainActivity extends FlutterActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        GeneratedPluginRegistrant.registerWith(this);
-        PlatformPlugin.registerWith(registrarFor("ml.cerasus.pics"));
-    }
+interface PlatformPluginImpl {
+    String PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".file_provider";
+
+    void share(String path, Result result) throws IOException;
+
+    void useAsWallpaper(String file, Result result);
+
+    void requestReview(Result result);
+
+    void isAlbumAuthorized(Result result);
+
+    void openAppSettings(Result result);
+
+    void syncAlbum(MethodCall call, Result result) throws IOException;
 }

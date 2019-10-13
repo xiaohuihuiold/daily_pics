@@ -18,18 +18,25 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:daily_pics/misc/bean.dart';
-import 'package:daily_pics/misc/local_storage.dart';
+import 'package:daily_pics/utils/local_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Utils {
-  static MethodChannel _channel = MethodChannel('ml.cerasus.pics');
+const MethodChannel _channel = MethodChannel('ml.cerasus.pics');
 
-  static Future<void> share(File file) async {
-    await _channel.invokeMethod('share', file.path);
+class SystemUtils {
+  static Future<void> share(File file, [Rect originRect]) async {
+    Map<String, dynamic> params = {'file': file.path};
+    if (originRect != null) {
+      params['originX'] = originRect.left;
+      params['originY'] = originRect.top;
+      params['originWidth'] = originRect.width;
+      params['originHeight'] = originRect.height;
+    }
+    await _channel.invokeMethod('share', params);
   }
 
   static Future<void> useAsWallpaper(File file) async {
@@ -48,6 +55,21 @@ class Utils {
     await _channel.invokeMethod('openAppSettings');
   }
 
+  static bool isIPad(BuildContext context, [bool strict = false]) {
+    Size size = MediaQuery.of(context).size;
+    if (strict) {
+      return size.shortestSide >= 600;
+    }
+    return size.width >= 600;
+  }
+
+  static bool isPortrait(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return size.width < size.height;
+  }
+}
+
+class Utils {
   static Future<File> download(
     Picture data,
     void Function(int count, int total) cb,
@@ -152,27 +174,12 @@ class Utils {
     return (c.red * 299 + c.green * 587 + c.blue * 114) / 1000 < 128;
   }
 
-  static bool isUUID(String input) {
+  static bool isUuid(String input) {
     RegExp regExp = RegExp(
       r'^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$',
       caseSensitive: false,
     );
     return regExp.hasMatch(input);
-  }
-}
-
-class Device {
-  static bool isIPad(BuildContext context, [bool strict = false]) {
-    Size size = MediaQuery.of(context).size;
-    if (strict) {
-      return size.shortestSide >= 600;
-    }
-    return size.width >= 600;
-  }
-
-  static bool isPortrait(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return size.width < size.height;
   }
 }
 
@@ -186,16 +193,4 @@ class Settings {
   static List<String> get marked => _prefs['marked'] ?? [];
 
   static set marked(List<String> value) => _prefs['marked'] = value;
-
-  /// App 启动次数
-  ///
-  /// 示例：'[1, 2, 2, 0, 1]'
-  static String get launchTimes => _prefs['launch_times'] ?? '[0]';
-
-  static set launchTimes(String value) => _prefs['launch_times'] = value;
-
-  /// 最后启动时间
-  static String get lastLaunch => _prefs['last_launch'];
-
-  static set lastLaunch(String value) => _prefs['last_launch'] = value;
 }
